@@ -166,7 +166,7 @@ function PassphraseModal({ onSubmit, onClose }) {
       display:'flex', alignItems:'center', justifyContent:'center'
     }}>
       <div style={{
-        background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:12,
+        background:'var(--panel)', border:'1px solid var(--border)', borderRadius:12,
         padding:'28px 32px', width:340, display:'flex', flexDirection:'column', gap:16
       }}>
         <div style={{fontSize:'1.05rem', fontWeight:700, color:'var(--text)'}}>Sync passphrase</div>
@@ -209,16 +209,43 @@ function PassphraseModal({ onSubmit, onClose }) {
 // ── Sync Status Badge ─────────────────────────────────────────────────────────
 export function SyncBadge() {
   const { passHash, status, lastSync, saveToServer, clearPassphrase, setShowModal } = useSync()
+  const [menuOpen,      setMenuOpen]      = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const menuRef = React.useRef(null)
+
+  // Close menu on outside click
+  React.useEffect(() => {
+    if (!menuOpen) return
+    const handler = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [menuOpen])
 
   const fmtTime = (iso) => {
     if (!iso) return ''
-    const d = new Date(iso)
-    return d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+    return new Date(iso).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
   }
 
-  const icon  = { idle:'☁', syncing:'↻', ok:'✓', error:'⚠', offline:'✗' }[status] || '☁'
-  const color = { idle:'var(--text3)', syncing:'rgba(var(--accent),1)', ok:'rgba(var(--ok),0.9)', error:'#e57', offline:'#e57' }[status] || 'var(--text3)'
+  const handleDelete = async () => {
+    try {
+      await fetch('/api/sync', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${passHash}`
+        }
+      })
+    } catch(e) {}
+    clearPassphrase()
+    setConfirmDelete(false)
+    setMenuOpen(false)
+  }
 
+  const syncIcon  = { idle:'☁', syncing:'↻', ok:'✓', error:'⚠', offline:'✗' }[status] || '☁'
+  const syncColor = { idle:'var(--text3)', syncing:'rgba(var(--accent),1)', ok:'rgba(var(--ok),0.9)', error:'#e57', offline:'#e57' }[status] || 'var(--text3)'
+  const syncLabel = status==='ok' && lastSync ? `Synced ${fmtTime(lastSync)}` : status==='syncing' ? 'Syncing…' : status==='offline' ? 'Offline' : 'Sync'
+
+  // ── Logged out ──
   if (!passHash) {
     return (
       <button onClick={()=>setShowModal(true)} style={{
@@ -226,27 +253,102 @@ export function SyncBadge() {
         color:'var(--text3)', background:'transparent', border:'1px solid var(--border)',
         borderRadius:6, padding:'3px 9px', cursor:'pointer', whiteSpace:'nowrap'
       }}>
-        ☁ Enable sync
+        Login
       </button>
     )
   }
 
+  // ── Logged in ──
   return (
-    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-      <button onClick={saveToServer} title="Save now" style={{
-        display:'flex', alignItems:'center', gap:4, fontSize:'.7rem',
-        color, background:'transparent', border:'1px solid var(--border)',
-        borderRadius:6, padding:'3px 9px', cursor:'pointer', whiteSpace:'nowrap'
-      }}>
-        <span style={{display:'inline-block', animation: status==='syncing'?'spin 1s linear infinite':'none'}}>
-          {icon}
-        </span>
-        {status==='ok' && lastSync ? `Synced ${fmtTime(lastSync)}` : status==='syncing' ? 'Syncing…' : status==='offline' ? 'Offline' : 'Sync'}
-      </button>
-      <button onClick={clearPassphrase} title="Disconnect sync" style={{
-        fontSize:'.65rem', color:'var(--text3)', background:'transparent',
-        border:'none', cursor:'pointer', padding:'2px 4px'
-      }}>✕</button>
-    </div>
+    <>
+      {/* Delete confirmation modal */}
+      {confirmDelete && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.75)',zIndex:1001,display:'flex',alignItems:'center',justifyContent:'center'}}>
+          <div style={{background:'var(--panel)',border:'1px solid var(--border)',borderRadius:12,padding:'24px 28px',width:320,display:'flex',flexDirection:'column',gap:14}}>
+            <div style={{fontSize:'1rem',fontWeight:700,color:'var(--text)'}}>Delete account data?</div>
+            <div style={{fontSize:'.78rem',color:'var(--text3)',lineHeight:1.6}}>
+              This will permanently delete all your synced data from the server and log you out.
+              Local data stays until you clear it manually.
+            </div>
+            <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
+              <button className="btn" onClick={()=>setConfirmDelete(false)}
+                style={{background:'transparent',border:'1px solid var(--border)',color:'var(--text2)'}}>
+                Cancel
+              </button>
+              <button className="btn" onClick={handleDelete}
+                style={{background:'rgba(var(--danger),0.85)',color:'#fff',border:'1px solid rgba(var(--danger),0.4)'}}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Badge row */}
+      <div ref={menuRef} style={{position:'relative',display:'flex',alignItems:'center',gap:6}}>
+        {/* Logout button */}
+        <button onClick={clearPassphrase} style={{
+          fontSize:'.7rem', color:'var(--text3)', background:'transparent',
+          border:'1px solid var(--border)', borderRadius:6,
+          padding:'3px 9px', cursor:'pointer', whiteSpace:'nowrap'
+        }}>
+          Logout
+        </button>
+
+        {/* Gear icon button */}
+        <button onClick={()=>setMenuOpen(o=>!o)} style={{
+          display:'flex', alignItems:'center', justifyContent:'center',
+          width:26, height:26, borderRadius:6, cursor:'pointer',
+          background: menuOpen ? 'var(--hover)' : 'transparent',
+          border:'1px solid var(--border)', color:'var(--text3)', flexShrink:0,
+          transition:'background .13s'
+        }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+
+        {/* Dropdown menu */}
+        {menuOpen && (
+          <div style={{
+            position:'absolute', top:'calc(100% + 6px)', right:0, zIndex:200,
+            background:'var(--panel)', border:'1px solid var(--border)',
+            borderRadius:8, minWidth:160, boxShadow:'0 4px 16px rgba(0,0,0,0.2)',
+            overflow:'hidden', display:'flex', flexDirection:'column'
+          }}>
+            {/* Sync now */}
+            <button onClick={()=>{saveToServer();setMenuOpen(false)}} style={{
+              display:'flex', alignItems:'center', gap:10, padding:'10px 14px',
+              background:'transparent', border:'none', cursor:'pointer',
+              color:syncColor, fontSize:'.78rem', textAlign:'left',
+              transition:'background .1s'
+            }}
+            onMouseEnter={e=>e.currentTarget.style.background='var(--hover)'}
+            onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+              <span style={{animation:status==='syncing'?'spin 1s linear infinite':'none',display:'inline-block'}}>{syncIcon}</span>
+              {syncLabel}
+            </button>
+
+            <div style={{height:1,background:'var(--border)',margin:'0 10px'}}/>
+
+            {/* Delete user */}
+            <button onClick={()=>{setMenuOpen(false);setConfirmDelete(true)}} style={{
+              display:'flex', alignItems:'center', gap:10, padding:'10px 14px',
+              background:'transparent', border:'none', cursor:'pointer',
+              color:'rgba(var(--danger),0.85)', fontSize:'.78rem', textAlign:'left',
+              transition:'background .1s'
+            }}
+            onMouseEnter={e=>e.currentTarget.style.background='var(--hover)'}
+            onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+              </svg>
+              Delete user
+            </button>
+          </div>
+        )}
+      </div>
+    </>
   )
 }
