@@ -683,8 +683,26 @@ function ResinCard({ activeTeamId, onChange }) {
 
   // Priority 1: domain if farmable today
   if(domainFarmable) {
-    plan.push({label:'Talent / Weapon domain', cost:20, tag:'Farm today for active team', urgent:false,
-      icon:'https://genshin-impact.fandom.com/wiki/Special:FilePath/System_Talent.png'})
+    // Collect the specific domain names relevant to this team today
+    const relevantDomains = new Set()
+    memberIds.forEach(charId => {
+      const def = CHARACTERS.find(c=>c.id===charId); if(!def) return
+      const cd  = trackedChars[charId]; const talents = cd?.talents||{}
+      if(Math.max(talents.aa||1,talents.e||1,talents.q||1)<9)
+        activeTalentDomains.forEach(d=>{ if(d.drops.includes(def.talentBook)) relevantDomains.add(d.name) })
+      const weapon = WEAPONS.find(w=>w.id===cd?.weapon)
+      const weaponLvl = getWeaponLevel(cd?.weapon)
+      if(weapon && weaponLvl<90)
+        activeWeaponDomains.forEach(d=>{ if(d.drops.includes(weapon.domainMat)) relevantDomains.add(d.name) })
+    })
+    const domainNames = [...relevantDomains].join(' · ') || 'Farm today for active team'
+    plan.push({
+      label: domainNames,
+      cost: 20,
+      tag: `Talent / Weapon domain — ${activeTeam?.name||'active team'}`,
+      urgent: false,
+      icon: 'https://static.wikia.nocookie.net/gensin-impact/images/d/d2/System_Talent.png/revision/latest?cb=20210911040808',
+    })
   }
 
   // Priority 2: weekly boss — prefer if urgent (≤2 days) or domain not farmable

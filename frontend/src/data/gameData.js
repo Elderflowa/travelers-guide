@@ -45,6 +45,32 @@ export const charIcon = (id) => {
 // WEAPON ICONS - paimon.moe snake_case weapon IDs
 const WEAPON_ICON_OVERRIDES = {
   'prospectors_shovel': "https://static.wikia.nocookie.net/gensin-impact/images/f/fc/Weapon_Prospector%27s_Shovel.png",
+  // ── Newer weapons not on paimon.moe — icy-veins CDN ──
+  'azurelight': 'https://static.icy-veins.com/images/genshin-impact/weapons/azurelight.webp',
+  'lightbearing_moonshard': 'https://static.icy-veins.com/images/genshin-impact/weapons/lightbearing-moonshard.webp',
+  'calamity_of_eshu': 'https://static.icy-veins.com/images/genshin-impact/weapons/calamity-of-eshu.webp',
+  'sturdy_bone': 'https://static.icy-veins.com/images/genshin-impact/weapons/sturdy-bone.webp',
+  'serenity_call': 'https://static.icy-veins.com/images/genshin-impact/weapons/serenitys-call.webp',
+  'moonweavers_dawn': 'https://static.icy-veins.com/images/genshin-impact/weapons/moonweavers-dawn.webp',
+  'a_thousand_blazing_suns': 'https://static.icy-veins.com/images/genshin-impact/weapons/a-thousand-blazing-suns.webp',
+  'fang_of_the_mountain_king': 'https://static.icy-veins.com/images/genshin-impact/weapons/fang-of-the-mountain-king.webp',
+  'master_key': 'https://static.icy-veins.com/images/genshin-impact/weapons/master-key.webp',
+  'fractured_halo': 'https://static.icy-veins.com/images/genshin-impact/weapons/fractured-halo.webp',
+  'symphonist_of_scents': 'https://static.icy-veins.com/images/genshin-impact/weapons/symphonist-of-scents.webp',
+  'sacrificers_staff': 'https://static.icy-veins.com/images/genshin-impact/weapons/sacrificers-staff.webp',
+  'everlasting_moonglow': 'https://static.icy-veins.com/images/genshin-impact/weapons/everlasting-moonglow.webp',
+  'crane_echoing_call': 'https://static.icy-veins.com/images/genshin-impact/weapons/cranes-echoing-call.webp',
+  'nocturne_curtain_call': 'https://static.icy-veins.com/images/genshin-impact/weapons/nocturnes-curtain-call.webp',
+  'starcallers_watch': 'https://static.icy-veins.com/images/genshin-impact/weapons/starcallers-watch.webp',
+  'sunny_morning_sleep_in': 'https://static.icy-veins.com/images/genshin-impact/weapons/sunny-morning-sleep-in.webp',
+  'vivid_notions': 'https://static.icy-veins.com/images/genshin-impact/weapons/vivid-notions.webp',
+  'blackmarrow_lantern': 'https://static.icy-veins.com/images/genshin-impact/weapons/blackmarrow-lantern.webp',
+  'etherlight_spindlelute': 'https://static.icy-veins.com/images/genshin-impact/weapons/etherlight-spindlelute.webp',
+  'astral_vultures_crimson_plumage': 'https://static.icy-veins.com/images/genshin-impact/weapons/astral-vultures-crimson-plumage.webp',
+  'the_daybreak_chronicles': 'https://static.icy-veins.com/images/genshin-impact/weapons/the-daybreak-chronicles.webp',
+  'snare_hook': 'https://static.icy-veins.com/images/genshin-impact/weapons/snare-hook.webp',
+  'rainbow_serpents_rain_bow': 'https://static.icy-veins.com/images/genshin-impact/weapons/rainbow-serpents-rain-bow.webp',
+  'sequence_of_solitude': 'https://static.icy-veins.com/images/genshin-impact/weapons/sequence-of-solitude.webp',
 }
 export const weaponIcon     = (id) => WEAPON_ICON_OVERRIDES[id] || `${PM}/weapons/${id}.png`
 export const weaponTypeIcon = (t)  => `${PM}/weapons/${t.toLowerCase()}.png`
@@ -206,7 +232,6 @@ export const WEAPONS = [
   {id:'vortex_vanquisher',             name:'Vortex Vanquisher',               type:'Polearm',  rarity:5, domainMat:'guyun'},
   {id:'skyward_spine',                 name:'Skyward Spine',                   type:'Polearm',  rarity:5, domainMat:'decarabian'},
   {id:'lumidouce_elegy',               name:'Lumidouce Elegy',                 type:'Polearm',  rarity:5, domainMat:'broken_goblet'},
-  {id:'sacrificers_staff',             name:"Sacrificer's Staff",              type:'Polearm',  rarity:5, domainMat:'far_north'},
   // ── 4★ Polearms ──
   {id:'the_catch',                     name:'The Catch',                       type:'Polearm',  rarity:4, domainMat:'distant_sea'},
   {id:'dragons_bane',                  name:"Dragon's Bane",                   type:'Polearm',  rarity:4, domainMat:'aerosiderite'},
@@ -278,6 +303,51 @@ export const WEAPONS = [
   {id:'end_of_the_line',               name:'End of the Line',                 type:'Bow',      rarity:4, domainMat:'scorching_might'},
   {id:'ibis_piercer',                  name:'Ibis Piercer',                    type:'Bow',      rarity:4, domainMat:'oasis_garden'},
   {id:'range_gauge',                   name:'Range Gauge',                     type:'Bow',      rarity:4, domainMat:'blazing_heart'},
+
+  // ── 5★ Swords (newer) ──
+  {id:'azurelight',                    name:'Azurelight',                      type:'Sword',    rarity:5, domainMat:'far_north'},
+  {id:'lightbearing_moonshard',        name:'Lightbearing Moonshard',          type:'Sword',    rarity:5, domainMat:'far_north'},
+
+  // ── 4★ Swords (newer) ──
+  {id:'calamity_of_eshu',              name:'Calamity of Eshu',                type:'Sword',    rarity:4, domainMat:'scorching_might'},
+  {id:'sturdy_bone',                   name:'Sturdy Bone',                     type:'Sword',    rarity:4, domainMat:'night_wind'},
+  {id:'serenity_call',                 name:"Serenity's Call",                 type:'Sword',    rarity:4, domainMat:'lightless_capital'},
+  {id:'moonweavers_dawn',              name:"Moonweaver's Dawn",               type:'Sword',    rarity:4, domainMat:'far_north'},
+
+  // ── 5★ Claymores (newer) ──
+  {id:'a_thousand_blazing_suns',       name:'A Thousand Blazing Suns',         type:'Claymore', rarity:5, domainMat:'ancient_watchtower'},
+  {id:'fang_of_the_mountain_king',     name:'Fang of the Mountain King',       type:'Claymore', rarity:5, domainMat:'ancient_watchtower'},
+
+  // ── 4★ Claymores (newer) ──
+  {id:'master_key',                    name:'Master Key',                      type:'Claymore', rarity:4, domainMat:'lightless_capital'},
+
+  // ── 5★ Polearms (newer) ──
+  {id:'fractured_halo',                name:'Fractured Halo',                  type:'Polearm',  rarity:5, domainMat:'far_north'},
+  {id:'symphonist_of_scents',          name:'Symphonist of Scents',            type:'Polearm',  rarity:5, domainMat:'talisman_soldier'},
+
+  // ── 4★ Polearms (newer) ──
+  {id:'sacrificers_staff',             name:"Sacrificer's Staff",              type:'Polearm',  rarity:4, domainMat:'far_north'},
+
+  // ── 5★ Catalysts (newer) ──
+  {id:'everlasting_moonglow',          name:'Everlasting Moonglow',            type:'Catalyst', rarity:5, domainMat:'court_flowing_sand'},
+  {id:'crane_echoing_call',            name:"Crane's Echoing Call",            type:'Catalyst', rarity:5, domainMat:'ancient_watchtower'},
+  {id:'nocturne_curtain_call',         name:"Nocturne's Curtain Call",         type:'Catalyst', rarity:5, domainMat:'far_north'},
+  {id:'starcallers_watch',             name:"Starcaller's Watch",              type:'Catalyst', rarity:5, domainMat:'ancient_watchtower'},
+  {id:'sunny_morning_sleep_in',        name:'Sunny Morning Sleep-In',          type:'Catalyst', rarity:5, domainMat:'forest_dew'},
+  {id:'vivid_notions',                 name:'Vivid Notions',                   type:'Catalyst', rarity:5, domainMat:'ancient_watchtower'},
+
+  // ── 4★ Catalysts (newer) ──
+  {id:'blackmarrow_lantern',           name:'Blackmarrow Lantern',             type:'Catalyst', rarity:4, domainMat:'lightless_capital'},
+  {id:'etherlight_spindlelute',        name:'Etherlight Spindlelute',          type:'Catalyst', rarity:4, domainMat:'far_north'},
+
+  // ── 5★ Bows (newer) ──
+  {id:'astral_vultures_crimson_plumage',name:"Astral Vulture's Crimson Plumage",type:'Bow',     rarity:5, domainMat:'tower_abject_pride'},
+  {id:'the_daybreak_chronicles',       name:'The Daybreak Chronicles',         type:'Bow',      rarity:5, domainMat:'long_night'},
+
+  // ── 4★ Bows (newer) ──
+  {id:'snare_hook',                    name:'Snare Hook',                      type:'Bow',      rarity:4, domainMat:'lightless_capital'},
+  {id:'rainbow_serpents_rain_bow',     name:"Rainbow Serpent's Rain Bow",      type:'Bow',      rarity:4, domainMat:'long_night'},
+  {id:'sequence_of_solitude',          name:'Sequence of Solitude',            type:'Bow',      rarity:4, domainMat:'talisman_soldier'},
 ]
 
 // ─── CHARACTERS ───────────────────────────────────────────────────────────────
@@ -406,6 +476,9 @@ export const CHARACTERS = [
   {id:'nefer',        name:'Nefer',            element:'Hydro',   rarity:5, weaponType:'Catalyst', talentBook:'elysium',     weaponMat:'far_north',        region:'Nod-Krai'},
   {id:'jahoda',       name:'Jahoda',           element:'Pyro',    rarity:4, weaponType:'Sword',    talentBook:'vagrancy',    weaponMat:'long_night',       region:'Nod-Krai'},
   {id:'dahlia',       name:'Dahlia',           element:'Cryo',    rarity:5, weaponType:'Sword',    talentBook:'vagrancy',    weaponMat:'long_night',       region:'Nod-Krai'},
+  // ── Special / Collab ──
+  {id:'aloy',         name:'Aloy',             element:'Cryo',    rarity:5, weaponType:'Bow',      talentBook:'freedom',     weaponMat:'guyun',            region:'Mondstadt'},
+
   // ── Special / Mondstadt (Durin) ──
   {id:'durin',        name:'Durin',            element:'Pyro',    rarity:5, weaponType:'Sword',    talentBook:'ballad',      weaponMat:'decarabian',       region:'Mondstadt'},
 ]
