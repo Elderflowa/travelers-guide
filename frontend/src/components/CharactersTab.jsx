@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { CHARACTERS, ELEMENTS, ARTIFACT_SETS, TALENT_BOOKS, WEAPONS, charIcon, weaponIcon, artifactIcon } from '../data/gameData.js'
+import { CHARACTERS, ELEMENTS, ARTIFACT_SETS, TALENT_BOOKS, WEAPONS, WEEKLY_BOSSES_INFO, charIcon, weaponIcon, artifactIcon } from '../data/gameData.js'
 
 const ls  = k=>{ try{return JSON.parse(localStorage.getItem(k))}catch{return null} }
 const lss = (k,v)=>localStorage.setItem(k,JSON.stringify(v))
@@ -62,28 +62,38 @@ function CharCard({charDef,charData,onUpdate,onRemove}){
   const book  = TALENT_BOOKS[charDef.talentBook]
   const ic    = charIcon(charDef.id)
   const [weapSearch, setWeapSearch] = useState('')
-  const [artSearch, setArtSearch]   = useState('')
-  const [artOpen, setArtOpen]       = useState(false)
+  const [artSearch,  setArtSearch]  = useState('')
+  const [art2Search, setArt2Search] = useState('')
+  const [artOpen,    setArtOpen]    = useState(false)
+  const [art2Open,   setArt2Open]   = useState(false)
   const ownedWeaponsRaw = JSON.parse(localStorage.getItem('tv_weapons_owned') || '{}')
   const ownedWeaponIds = Array.isArray(ownedWeaponsRaw) ? ownedWeaponsRaw : Object.keys(ownedWeaponsRaw)
   const validWeapons = WEAPONS.filter(w=>w.type===charDef.weaponType).sort((a,b)=>b.rarity-a.rarity||a.name.localeCompare(b.name))
   const ownedValidWeapons = validWeapons.filter(w=>ownedWeaponIds.includes(w.id))
-  // If nothing owned yet, fall back to all weapons
   const weaponPool = ownedValidWeapons.length > 0 ? ownedValidWeapons : validWeapons
   const filteredWeapons = weapSearch
     ? weaponPool.filter(w=>w.name.toLowerCase().includes(weapSearch.toLowerCase()))
     : weaponPool
-  const selectedWeapon   = WEAPONS.find(w=>w.id===charData.weapon) || null
-  const artId = charData.artifactSet && charData.artifactSet!=='none' && charData.artifactSet!=='None'
-    ? charData.artifactSet
-    : 'none'
-  const selectedArtifact = ARTIFACT_SETS.find(a=>a.id===artId) || ARTIFACT_SETS[0]
-  const selectedArtifactIcon = selectedArtifact?.enkaId ? artifactIcon(selectedArtifact.enkaId) : null
-  const filteredArtifacts = artSearch
-    ? ARTIFACT_SETS.filter(a=>a.name.toLowerCase().includes(artSearch.toLowerCase()))
-    : ARTIFACT_SETS
+  const selectedWeapon = WEAPONS.find(w=>w.id===charData.weapon) || null
+  // Artifact — supports 2pc (two sets) or 4pc (one set)
+  const artMode = charData.artifactMode || '4pc'
+  const artId  = charData.artifactSet  && charData.artifactSet!=='none'  && charData.artifactSet!=='None'  ? charData.artifactSet  : 'none'
+  const artId2 = charData.artifactSet2 && charData.artifactSet2!=='none' ? charData.artifactSet2 : 'none'
+  const selectedArtifact  = ARTIFACT_SETS.find(a=>a.id===artId)  || ARTIFACT_SETS[0]
+  const selectedArtifact2 = ARTIFACT_SETS.find(a=>a.id===artId2) || null
+  const artIcon1 = selectedArtifact?.enkaId  ? artifactIcon(selectedArtifact.enkaId)  : null
+  const artIcon2 = selectedArtifact2?.enkaId ? artifactIcon(selectedArtifact2.enkaId) : null
+  const filteredArtifacts  = artSearch  ? ARTIFACT_SETS.filter(a=>a.name.toLowerCase().includes(artSearch.toLowerCase()))  : ARTIFACT_SETS
+  const filteredArtifacts2 = art2Search ? ARTIFACT_SETS.filter(a=>a.name.toLowerCase().includes(art2Search.toLowerCase())) : ARTIFACT_SETS
+  // Weekly boss indicator
+  const bossInfo = charDef.weeklyBoss ? WEEKLY_BOSSES_INFO.find(b=>b.id===charDef.weeklyBoss) : null
   const upd = (k,v)=>onUpdate({...charData,[k]:v})
   const updTalent = (slot,v)=>onUpdate({...charData,talents:{...charData.talents,[slot]:Math.max(1,Math.min(10,v))}})
+  const switchArtMode = (mode) => {
+    const next = {...charData, artifactMode: mode}
+    if(mode==='4pc') next.artifactSet2 = 'none'
+    onUpdate(next)
+  }
 
   return (
     <div className="char-card">
@@ -103,6 +113,7 @@ function CharCard({charDef,charData,onUpdate,onRemove}){
             <span style={{color:'var(--text3)'}}>{charDef.weaponType}</span>
             {book&&<><span style={{color:'var(--text3)'}}>·</span><span style={{color:book.color,fontSize:'.64rem'}}>{book.name}</span></>}
           </div>
+
         </div>
         <span className={`char-rar ${charDef.rarity===5?'r5c':'r4c'}`}>{'★'.repeat(charDef.rarity)}</span>
       </div>
@@ -122,76 +133,134 @@ function CharCard({charDef,charData,onUpdate,onRemove}){
       </div>
       <AscTrack value={charData.ascension} onChange={v=>upd('ascension',v)}/>
 
-      <div className="char-bottom">
-        {/* Weapon — searchable */}
-        <div className="weapon-search-wrap" style={{flex:2,minWidth:120,position:'relative'}}>
-          {selectedWeapon && (
-            <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:3}}>
-              <img src={weaponIcon(selectedWeapon.id)} style={{width:22,height:22,objectFit:'contain'}} alt={selectedWeapon.name}
-                onError={e=>{e.target.style.display='none'}}/>
-              <span style={{fontSize:'.74rem',color:selectedWeapon.rarity===5?'rgba(var(--five),1)':'rgba(var(--four),1)',flex:1,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
-                {'★'.repeat(selectedWeapon.rarity)} {selectedWeapon.name}
-              </span>
-              <button style={{fontSize:'.65rem',color:'var(--text3)',padding:'0 3px',flexShrink:0}} onClick={()=>{upd('weapon','');setWeapSearch('')}}>✕</button>
-            </div>
-          )}
-          <input className="input" placeholder={ownedValidWeapons.length > 0 ? `Owned ${charDef.weaponType}s…` : `Search ${charDef.weaponType}…`}
-            value={weapSearch} onChange={e=>setWeapSearch(e.target.value)}
-            style={{width:'100%',fontSize:'.75rem',padding:'4px 8px'}}/>
-          {weapSearch && (
-            <div className="weap-dropdown">
-              {filteredWeapons.slice(0,12).map(w=>(
-                <div key={w.id} className="weap-opt" onClick={()=>{upd('weapon',w.id);setWeapSearch('')}}>
-                  <img src={weaponIcon(w.id)} style={{width:20,height:20,objectFit:'contain'}} alt={w.name}
-                    onError={e=>{e.target.style.display='none'}}/>
-                  <span style={{color:w.rarity===5?'rgba(var(--five),1)':'rgba(var(--four),1)',fontSize:'.75rem'}}>
-                    {'★'.repeat(w.rarity)} {w.name}
-                  </span>
-                </div>
-              ))}
-              {filteredWeapons.length===0&&<div style={{padding:'6px 10px',fontSize:'.72rem',color:'var(--text3)'}}>No results</div>}
-            </div>
-          )}
-        </div>
-
-        {/* Artifact set — searchable */}
-        <div style={{flex:2,minWidth:120,position:'relative'}}>
-          {selectedArtifact && selectedArtifact.id!=='none' && (
-            <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:3}}>
-              {selectedArtifactIcon && (
-                <img src={selectedArtifactIcon} style={{width:22,height:22,objectFit:'contain',borderRadius:4}} alt={selectedArtifact.name}
-                  onError={e=>{e.target.style.display='none'}}/>
-              )}
-              <span style={{fontSize:'.72rem',color:'var(--text2)',flex:1,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
-                {selectedArtifact.name}
-              </span>
-              <button style={{fontSize:'.65rem',color:'var(--text3)',padding:'0 3px',flexShrink:0}} onClick={()=>{upd('artifactSet','none');setArtSearch('')}}>✕</button>
-            </div>
-          )}
-          <input className="input" placeholder="Search artifact set…"
-            value={artSearch} onChange={e=>{setArtSearch(e.target.value);setArtOpen(true)}}
-            onFocus={()=>setArtOpen(true)} onBlur={()=>setTimeout(()=>setArtOpen(false),150)}
-            style={{width:'100%',fontSize:'.75rem',padding:'4px 8px'}}/>
-          {artOpen && (
-            <div className="weap-dropdown">
-              {filteredArtifacts.filter(a=>a.id!=='none').slice(0,12).map(a=>(
-                <div key={a.id} className="weap-opt" onMouseDown={()=>{upd('artifactSet',a.id);setArtSearch('');setArtOpen(false)}}>
-                  {a.enkaId && (
-                    <img src={artifactIcon(a.enkaId)} style={{width:20,height:20,objectFit:'contain',borderRadius:3}} alt={a.name}
-                      onError={e=>{e.target.style.display='none'}}/>
-                  )}
-                  <span style={{fontSize:'.75rem',color:'var(--text)'}}>{a.name}</span>
-                </div>
-              ))}
-              {filteredArtifacts.filter(a=>a.id!=='none').length===0&&<div style={{padding:'6px 10px',fontSize:'.72rem',color:'var(--text3)'}}>No results</div>}
-            </div>
-          )}
-        </div>
-
-        <button className="btn btn-danger btn-sm" onClick={onRemove} style={{flexShrink:0,alignSelf:'flex-end'}}>✕</button>
+      {/* ── Weapon row ── */}
+      <div style={{position:'relative'}}>
+        {selectedWeapon ? (
+          <div style={{display:'flex',alignItems:'center',gap:6,padding:'4px 0'}}>
+            <img src={weaponIcon(selectedWeapon.id)} style={{width:22,height:22,objectFit:'contain',flexShrink:0}} alt={selectedWeapon.name} onError={e=>{e.target.style.display='none'}}/>
+            <span style={{fontSize:'.74rem',color:selectedWeapon.rarity===5?'rgba(var(--five),1)':'rgba(var(--four),1)',flex:1,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+              {'★'.repeat(selectedWeapon.rarity)} {selectedWeapon.name}
+            </span>
+            <button style={{fontSize:'.65rem',color:'var(--text3)',padding:'0 3px',flexShrink:0}} onClick={()=>{upd('weapon','');setWeapSearch('')}}>✕</button>
+          </div>
+        ) : (
+          <>
+            <input className="input" placeholder={ownedValidWeapons.length > 0 ? `Owned ${charDef.weaponType}s…` : `Search ${charDef.weaponType}…`}
+              value={weapSearch} onChange={e=>setWeapSearch(e.target.value)}
+              style={{width:'100%',fontSize:'.75rem',padding:'4px 8px'}}/>
+            {weapSearch && (
+              <div className="weap-dropdown">
+                {filteredWeapons.slice(0,12).map(w=>(
+                  <div key={w.id} className="weap-opt" onClick={()=>{upd('weapon',w.id);setWeapSearch('')}}>
+                    <img src={weaponIcon(w.id)} style={{width:20,height:20,objectFit:'contain'}} alt={w.name} onError={e=>{e.target.style.display='none'}}/>
+                    <span style={{color:w.rarity===5?'rgba(var(--five),1)':'rgba(var(--four),1)',fontSize:'.75rem'}}>{'★'.repeat(w.rarity)} {w.name}</span>
+                  </div>
+                ))}
+                {filteredWeapons.length===0&&<div style={{padding:'6px 10px',fontSize:'.72rem',color:'var(--text3)'}}>No results</div>}
+              </div>
+            )}
+          </>
+        )}
       </div>
 
-      <textarea className="input" rows={2} placeholder="Notes…" value={charData.notes} onChange={e=>upd('notes',e.target.value)}/>
+      {/* ── Artifact row ── */}
+      <div>
+        {/* First set row: chip or search + mode toggle */}
+        <div style={{display:'flex',alignItems:'center',gap:6,position:'relative'}}>
+          <div style={{flex:1,minWidth:0,position:'relative'}}>
+            {artId!=='none' ? (
+              <div style={{display:'flex',alignItems:'center',gap:5}}>
+                {artIcon1&&<img src={artIcon1} style={{width:20,height:20,objectFit:'contain',borderRadius:3,flexShrink:0}} alt={selectedArtifact.name} onError={e=>{e.target.style.display='none'}}/>}
+                <span style={{fontSize:'.72rem',color:'var(--text2)',flex:1,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{selectedArtifact.name}</span>
+                <button style={{fontSize:'.65rem',color:'var(--text3)',padding:'0 3px',flexShrink:0}} onClick={()=>{upd('artifactSet','none');setArtSearch('')}}>✕</button>
+              </div>
+            ) : (
+              <>
+                <input className="input" placeholder="Search artifact set…"
+                  value={artSearch} onChange={e=>{setArtSearch(e.target.value);setArtOpen(true)}}
+                  onFocus={()=>setArtOpen(true)} onBlur={()=>setTimeout(()=>setArtOpen(false),150)}
+                  style={{width:'100%',fontSize:'.75rem',padding:'4px 8px'}}/>
+                {artOpen&&(
+                  <div className="weap-dropdown">
+                    {filteredArtifacts.filter(a=>a.id!=='none').slice(0,12).map(a=>(
+                      <div key={a.id} className="weap-opt" onMouseDown={()=>{upd('artifactSet',a.id);setArtSearch('');setArtOpen(false)}}>
+                        {a.enkaId&&<img src={artifactIcon(a.enkaId)} style={{width:20,height:20,objectFit:'contain',borderRadius:3}} alt={a.name} onError={e=>{e.target.style.display='none'}}/>}
+                        <span style={{fontSize:'.75rem',color:'var(--text)'}}>{a.name}</span>
+                      </div>
+                    ))}
+                    {filteredArtifacts.filter(a=>a.id!=='none').length===0&&<div style={{padding:'6px 10px',fontSize:'.72rem',color:'var(--text3)'}}>No results</div>}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+          {/* 4pc / 2pc toggle */}
+          {['4pc','2pc'].map(m=>(
+            <button key={m} onClick={()=>switchArtMode(m)}
+              style={{fontSize:'.6rem',padding:'1px 5px',borderRadius:4,border:'1px solid var(--border)',flexShrink:0,
+                background:artMode===m?'var(--accent)':'transparent',
+                color:artMode===m?'var(--text)':'var(--text3)',cursor:'pointer',lineHeight:'1.6'}}>
+              {m}
+            </button>
+          ))}
+        </div>
+        {/* Second set — only in 2pc mode */}
+        {artMode==='2pc'&&(
+          <div style={{position:'relative',marginTop:4}}>
+            {artId2!=='none' ? (
+              <div style={{display:'flex',alignItems:'center',gap:5}}>
+                {artIcon2&&<img src={artIcon2} style={{width:20,height:20,objectFit:'contain',borderRadius:3,flexShrink:0}} alt={selectedArtifact2.name} onError={e=>{e.target.style.display='none'}}/>}
+                <span style={{fontSize:'.72rem',color:'var(--text2)',flex:1,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{selectedArtifact2.name}</span>
+                <button style={{fontSize:'.65rem',color:'var(--text3)',padding:'0 3px',flexShrink:0}} onClick={()=>{upd('artifactSet2','none');setArt2Search('')}}>✕</button>
+              </div>
+            ) : (
+              <>
+                <input className="input" placeholder="Search 2nd set…"
+                  value={art2Search} onChange={e=>{setArt2Search(e.target.value);setArt2Open(true)}}
+                  onFocus={()=>setArt2Open(true)} onBlur={()=>setTimeout(()=>setArt2Open(false),150)}
+                  style={{width:'100%',fontSize:'.75rem',padding:'4px 8px'}}/>
+                {art2Open&&(
+                  <div className="weap-dropdown">
+                    {filteredArtifacts2.filter(a=>a.id!=='none').slice(0,12).map(a=>(
+                      <div key={a.id} className="weap-opt" onMouseDown={()=>{upd('artifactSet2',a.id);setArt2Search('');setArt2Open(false)}}>
+                        {a.enkaId&&<img src={artifactIcon(a.enkaId)} style={{width:20,height:20,objectFit:'contain',borderRadius:3}} alt={a.name} onError={e=>{e.target.style.display='none'}}/>}
+                        <span style={{fontSize:'.75rem',color:'var(--text)'}}>{a.name}</span>
+                      </div>
+                    ))}
+                    {filteredArtifacts2.filter(a=>a.id!=='none').length===0&&<div style={{padding:'6px 10px',fontSize:'.72rem',color:'var(--text3)'}}>No results</div>}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ── Materials ── */}
+      <div style={{borderTop:'1px solid var(--border)',paddingTop:6,marginTop:2}}>
+        <div style={{fontSize:'.65rem',color:'var(--text3)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.04em',marginBottom:4}}>Materials</div>
+        <div style={{display:'flex',flexDirection:'column',gap:3}}>
+          {book&&(
+            <div style={{display:'flex',alignItems:'center',gap:5}}>
+              <span style={{fontSize:'.65rem',color:'var(--text3)',width:36,flexShrink:0}}>Talent</span>
+              {book.icon&&<img src={book.icon} alt={book.name} style={{width:16,height:16,objectFit:'contain',borderRadius:3,flexShrink:0}} onError={e=>{e.target.style.display='none'}}/>}
+              <span style={{fontSize:'.72rem',color:book.color}}>{book.name}</span>
+            </div>
+          )}
+          {bossInfo&&(
+            <div style={{display:'flex',alignItems:'center',gap:5}}>
+              <span style={{fontSize:'.65rem',color:'var(--text3)',width:36,flexShrink:0}}>Boss</span>
+              <img src={bossInfo.icon} alt={bossInfo.label} style={{width:16,height:16,objectFit:'contain',borderRadius:3,flexShrink:0}} onError={e=>{e.target.style.display='none'}}/>
+              <span style={{fontSize:'.72rem',color:'var(--text2)'}}>{bossInfo.label}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Remove button */}
+      <div style={{display:'flex',justifyContent:'flex-end'}}>
+        <button className="btn btn-danger btn-sm" onClick={onRemove}>Remove</button>
+      </div>
     </div>
   )
 }

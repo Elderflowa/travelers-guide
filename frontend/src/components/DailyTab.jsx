@@ -53,17 +53,26 @@ const REGION_COLORS = {
   'Nod-Krai':  '#94a3b8',
 }
 const WEEKLY_BOSSES_FULL = [
-  {id:'w_wolf',      label:'Andrius',              region:'Mondstadt', sub:'Wolf of the North',              icon:`${W}/a/a4/Andrius_Icon.png`},
-  {id:'w_azhdaha',   label:'Azhdaha',              region:'Liyue',     sub:'Beneath the Dragon-Queller',     icon:`${W}/1/18/Enemy_Azhdaha.png`},
-  {id:'w_childe',    label:'Tartaglia',             region:'Liyue',     sub:'Enter the Golden House',         icon:`${W}/d/d9/Childe_P3_Icon.png`},
-  {id:'w_signora',   label:'La Signora',            region:'Inazuma',   sub:'Narukami Island: Tenshukaku',    icon:`${W}/5/57/NPC_Signora_Icon.png`},
-  {id:'w_raiden',    label:'Raiden Shogun',         region:'Inazuma',   sub:'End of the Oneiric Euthymia',    icon:`${PM}/characters/raiden_shogun.png`},
-  {id:'w_scaramouche',label:'Scaramouche',          region:'Sumeru',    sub:'Joururi Workshop',               icon:`${PM}/characters/wanderer.png`},
-  {id:'w_apep',      label:"Guardian of Apep's Oasis", region:'Sumeru', sub:"Golden Chalice's Bounty",    icon:'https://static.wikia.nocookie.net/gensin-impact/images/e/e2/Guardian_of_Apep%27s_Oasis_Icon.png/revision/latest?cb=20230412020920'},
-  {id:'w_narwhal',   label:'All-Devouring Narwhal', region:'Fontaine',  sub:'Set Sail',                       icon:'https://static.wikia.nocookie.net/gensin-impact/images/4/47/All-Devouring_Narwhal_Icon.png/revision/latest?cb=20231108024357'},
-  {id:'w_knave',     label:'The Knave',             region:'Fontaine',  sub:'Scattered Ruins',                icon:`${PM}/characters/arlecchino.png`},
-  {id:'w_natlan',    label:'Lord of Eroded Primal Fire', region:'Natlan', sub:'Stone Stele Records',         icon:'https://static.wikia.nocookie.net/gensin-impact/images/7/7e/Lord_of_Eroded_Primal_Fire_Icon.png/revision/latest?cb=20250101020418'},
-  {id:'w_nod_krai',  label:'The Game Before the Gate', region:'Mondstadt', sub:'Unresolved Chess Game',                   icon:'https://static.wikia.nocookie.net/gensin-impact/images/f/f1/The_Game_Before_the_Gate_Icon.png/revision/latest?cb=20250507021624'},
+  // ── Mondstadt ──
+  {id:'w_dvalin',    label:'Stormterror',               region:'Mondstadt', sub:"Stormterror's Lair",              icon:'https://static.wikia.nocookie.net/gensin-impact/images/8/8f/Stormterror_Icon.png'},
+  {id:'w_wolf',      label:'Andrius',                   region:'Mondstadt', sub:'Wolvendom',                       icon:`${W}/a/a4/Andrius_Icon.png`},
+  {id:'w_nod_krai',  label:'The Game Before the Gate',  region:'Mondstadt', sub:'Falcon Coast',                    icon:'https://static.wikia.nocookie.net/gensin-impact/images/f/f1/The_Game_Before_the_Gate_Icon.png/revision/latest?cb=20250507021624'},
+  // ── Liyue ──
+  {id:'w_childe',    label:'Tartaglia',                 region:'Liyue',     sub:'Golden House',                    icon:`${W}/d/d9/Childe_P3_Icon.png`},
+  {id:'w_azhdaha',   label:'Azhdaha',                   region:'Liyue',     sub:'Mt. Hulao',                       icon:`${W}/1/18/Enemy_Azhdaha.png`},
+  // ── Inazuma ──
+  {id:'w_signora',   label:'La Signora',                region:'Inazuma',   sub:'Inazuma City',                    icon:`${W}/5/57/NPC_Signora_Icon.png`},
+  {id:'w_raiden',    label:'Raiden Shogun',             region:'Inazuma',   sub:'Grand Narukami Shrine',           icon:`${PM}/characters/raiden_shogun.png`},
+  // ── Sumeru ──
+  {id:'w_scaramouche',label:'Scaramouche',              region:'Sumeru',    sub:'Chinvat Ravine',                  icon:`${PM}/characters/wanderer.png`},
+  {id:'w_apep',      label:"Guardian of Apep's Oasis", region:'Sumeru',    sub:'Desert of Hadramaveth',           icon:'https://static.wikia.nocookie.net/gensin-impact/images/e/e2/Guardian_of_Apep%27s_Oasis_Icon.png/revision/latest?cb=20230412020920'},
+  // ── Fontaine ──
+  {id:'w_narwhal',   label:'All-Devouring Narwhal',     region:'Fontaine',  sub:'Salacia Plain',                   icon:'https://static.wikia.nocookie.net/gensin-impact/images/4/47/All-Devouring_Narwhal_Icon.png/revision/latest?cb=20231108024357'},
+  {id:'w_knave',     label:'The Knave',                 region:'Fontaine',  sub:'Mont Esus East',                  icon:`${PM}/characters/arlecchino.png`},
+  // ── Natlan ──
+  {id:'w_natlan',    label:'Lord of Eroded Primal Fire', region:'Natlan',   sub:'Stadium of the Sacred Flame',     icon:'https://static.wikia.nocookie.net/gensin-impact/images/7/7e/Lord_of_Eroded_Primal_Fire_Icon.png/revision/latest?cb=20250101020418'},
+  // ── Nod-Krai ──
+  {id:'w_heretic',   label:'Heretic of the False Moon', region:'Nod-Krai',  sub:'Special Territory Research Institute', icon:'https://static.wikia.nocookie.net/gensin-impact/images/e/ee/Heretic_of_the_False_Moon_Icon.png'},
 ]
 const WEEKLY_NON_BOSS = [
   {id:'w_rep',       label:'Reputation Quests',    icon:'https://static.wikia.nocookie.net/gensin-impact/images/8/8e/System_City_Reputation.png'},
@@ -122,6 +131,52 @@ const charFullArt = (rawId) => {
   const id = rawId.toLowerCase().replace(/\s+/g,'_')
   if (id.startsWith('traveler')) return `${PM_FULL}/traveler.png`
   return `${PM_FULL}/${FULL_ART_IDS[id] || id}.png`
+}
+
+function TeamQuickPicker({ activeTeamId, onTeamSelect }) {
+  const teams = ls('tv_teams')||[]
+  if(!teams.length) return null
+  const activeTeam = (activeTeamId && teams.find(t=>String(t.id)===String(activeTeamId))) || teams[0]
+  const trackedChars = ls('tv_chars')||{}
+  // First character of active team for the avatar
+  const firstCharId = activeTeam?.slots?.find(Boolean)
+  const firstCharDef = firstCharId ? CHARACTERS.find(c=>c.id===firstCharId) : null
+  const firstCharEl = firstCharDef ? ELEMENTS[firstCharDef.element] : null
+  const firstCharIc = firstCharDef ? charIcon(firstCharDef.id) : null
+
+  return (
+    <div className="card" style={{marginBottom:12,padding:'10px 12px'}}>
+      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+        <div className="stitle" style={{marginBottom:0,fontSize:'.7rem'}}>Active Team</div>
+        <select className="input" value={String(activeTeam?.id||'')} onChange={e=>onTeamSelect(e.target.value)}
+          style={{flex:1,fontSize:'.72rem',padding:'2px 6px'}}>
+          {teams.map(t=><option key={t.id} value={String(t.id)}>{t.name}</option>)}
+        </select>
+      </div>
+      {firstCharDef && (
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <div style={{position:'relative',flexShrink:0}}>
+            {firstCharIc
+              ? <img src={firstCharIc} alt={firstCharDef.name}
+                  style={{width:40,height:40,borderRadius:'50%',objectFit:'cover',
+                    border:`2px solid rgba(${firstCharEl?.rgb||'200,169,110'},0.5)`}}
+                  onError={e=>{e.target.style.opacity=0}}/>
+              : <div style={{width:40,height:40,borderRadius:'50%',background:`rgba(${firstCharEl?.rgb||'200,169,110'},.15)`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  {firstCharEl&&<img src={firstCharEl.icon} style={{width:18,height:18}} alt={firstCharDef.element} onError={e=>{e.target.style.display='none'}}/>}
+                </div>
+            }
+          </div>
+          <div style={{minWidth:0}}>
+            <div style={{fontSize:'.78rem',fontWeight:600,color:'var(--text)',lineHeight:1.2}}>{firstCharDef.name}</div>
+            <div style={{display:'flex',alignItems:'center',gap:3,marginTop:2}}>
+              {firstCharEl&&<img src={firstCharEl.icon} style={{width:11,height:11}} alt={firstCharDef.element} onError={e=>{e.target.style.display='none'}}/>}
+              <span style={{fontSize:'.65rem',color:`rgba(${firstCharEl?.rgb||'200,169,110'},0.85)`}}>{firstCharDef.element}</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
 
 function BannerSidebar({ data }) {
@@ -538,21 +593,37 @@ function FarmAlertBanner({ activeTeamId }) {
     </div>
   )
 
-  const alerts = []
+  // Build alert entries: {name, bookIcon} per unfinished char with a farmable book today
+  const alertEntries = []
   memberIds.forEach(charId=>{
     const def=CHARACTERS.find(c=>c.id===charId); if(!def) return
     const talents = trackedChars[charId]?.talents||{}
     const maxTalent = Math.max(talents.aa||1, talents.e||1, talents.q||1)
-    if(maxTalent < 9) activeTalentDomains.forEach(dom=>{ if(dom.drops.includes(def.talentBook)) alerts.push(`${def.name} (${TALENT_BOOKS[def.talentBook]?.name})`) })
-    // weapon alerts removed — talents only
+    if(maxTalent < 9) activeTalentDomains.forEach(dom=>{
+      if(dom.drops.includes(def.talentBook) && !alertEntries.find(a=>a.charId===charId))
+        alertEntries.push({charId, name:def.name, bookIcon:TALENT_BOOKS[def.talentBook]?.icon, bookColor:TALENT_BOOKS[def.talentBook]?.color})
+    })
   })
-  if(!alerts.length) return null
+  if(!alertEntries.length) return null
+  const shown = alertEntries.slice(0,4)
+  const extra = alertEntries.length - shown.length
   return (
     <div className="domain-alert" style={{marginBottom:14,background:'rgba(var(--accent),0.12)',borderColor:'rgba(var(--accent),0.3)'}}>
-      <span className="domain-alert-icon">⚡</span>
+      <span className="domain-alert-icon" style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
+        <svg viewBox="0 0 20 20" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{color:'rgba(var(--accent),0.9)'}}><rect x="2" y="4" width="16" height="14" rx="2"/><line x1="2" y1="8" x2="18" y2="8"/><line x1="6" y1="2" x2="6" y2="6"/><line x1="14" y1="2" x2="14" y2="6"/></svg>
+      </span>
       <div style={{minWidth:0}}>
-        <div className="domain-alert-text" style={{color:'rgba(var(--accent),0.9)'}}>Talents available today ({activeTeam.name})</div>
-        <div className="domain-alert-names">{alerts.slice(0,4).join(' · ')}{alerts.length>4?` +${alerts.length-4} more`:''}</div>
+        <div className="domain-alert-text" style={{color:'rgba(var(--accent),0.9)'}}>Talents available today</div>
+        <div className="domain-alert-names" style={{display:'flex',flexWrap:'wrap',alignItems:'center',gap:'2px 6px'}}>
+          {shown.map((a,i)=>(
+            <span key={a.charId} style={{display:'inline-flex',alignItems:'center',gap:3}}>
+              {i>0&&<span style={{color:'var(--text3)',margin:'0 1px'}}>·</span>}
+              <span>{a.name}</span>
+              {a.bookIcon&&<img src={a.bookIcon} alt="" style={{width:14,height:14,objectFit:'contain',flexShrink:0}} onError={e=>{e.target.style.display='none'}}/>}
+            </span>
+          ))}
+          {extra>0&&<span style={{color:'var(--text3)'}}>+{extra} more</span>}
+        </div>
       </div>
     </div>
   )
@@ -560,9 +631,11 @@ function FarmAlertBanner({ activeTeamId }) {
 
 // ── Weekly boss list ─────────────────────────────────────────────────────────
 const WEEKLY_BOSSES = [
+  {id:'w_dvalin',      label:'Stormterror',                resin:30},
   {id:'w_wolf',        label:'Andrius',                    resin:30},
-  {id:'w_azhdaha',     label:'Azhdaha',                    resin:30},
+  {id:'w_nod_krai',    label:'The Game Before the Gate',   resin:60},
   {id:'w_childe',      label:'Tartaglia',                  resin:30},
+  {id:'w_azhdaha',     label:'Azhdaha',                    resin:30},
   {id:'w_signora',     label:'La Signora',                 resin:60},
   {id:'w_raiden',      label:'Raiden Shogun',              resin:60},
   {id:'w_scaramouche', label:'Scaramouche',                resin:60},
@@ -570,7 +643,7 @@ const WEEKLY_BOSSES = [
   {id:'w_narwhal',     label:'All-Devouring Narwhal',      resin:60},
   {id:'w_knave',       label:'The Knave',                  resin:60},
   {id:'w_natlan',      label:'Lord of Eroded Primal Fire', resin:60},
-  {id:'w_nod_krai',    label:'The Game Before the Gate',   resin:60},
+  {id:'w_heretic',     label:'Heretic of the False Moon',  resin:60},
 ]
 
 // ── Dynamic suggestion engine ─────────────────────────────────────────────────
@@ -609,7 +682,30 @@ function buildSuggestion(activeTeamId) {
     }
   })
 
-  const pendingBosses  = WEEKLY_BOSSES.filter(b=>!wChecks[b.id])
+  // Dynamic boss priority from team members who still need boss mats
+  const teamBossPriority = (() => {
+    const needed = new Set()
+    memberIds.forEach(charId => {
+      const def = CHARACTERS.find(c=>c.id===charId)
+      if(!def || !def.weeklyBoss) return
+      const cd = trackedChars[charId]
+      const talents = cd?.talents||{}
+      const lvl = cd?.level||1
+      const weaponLvl = getWeaponLevel(cd?.weapon)
+      const isMaxed = lvl>=90 && Math.min(talents.aa||1,talents.e||1,talents.q||1)>=9 && weaponLvl>=90
+      if(!isMaxed) needed.add(def.weeklyBoss)
+    })
+    return [...needed]
+  })()
+  const pendingBosses  = WEEKLY_BOSSES
+    .filter(b=>!wChecks[b.id])
+    .sort((a,b)=>{
+      const ai=teamBossPriority.indexOf(a.id), bi=teamBossPriority.indexOf(b.id)
+      if(ai>=0&&bi>=0) return ai-bi
+      if(ai>=0) return -1
+      if(bi>=0) return 1
+      return 0
+    })
   const daysUntilReset = today===0 ? 0 : 7-today
   const suggestions    = []
 
@@ -641,13 +737,35 @@ function ResinCard({ activeTeamId, onChange }) {
   const weeklyChecks = ls('tv_weekly')
   const wChecks      = (weeklyChecks&&weeklyChecks.key===weekKey())?weeklyChecks.checks||{}:{}
 
+  // Active team + tracked chars (must be declared before priority logic)
+  const teams        = ls('tv_teams')||[]
+  const trackedChars = ls('tv_chars')||{}
+  const activeTeam   = (activeTeamId&&teams.find(t=>String(t.id)===String(activeTeamId)))||teams[0]
+  const memberIds    = activeTeam ? activeTeam.slots.filter(Boolean) : []
+
   // How many weekly bosses already claimed this week?
-  const BOSS_PRIORITY = ['w_wolf','w_childe','w_knave']
   const claimedCount   = WEEKLY_BOSSES.filter(b=>wChecks[b.id]).length
+
+  // Dynamic boss priority: bosses needed by unfinished active team members first
+  const teamBossPriority = (() => {
+    const needed = new Set()
+    memberIds.forEach(charId => {
+      const def = CHARACTERS.find(c=>c.id===charId)
+      if(!def || !def.weeklyBoss) return
+      const cd = trackedChars[charId]
+      const talents = cd?.talents||{}
+      const lvl = cd?.level||1
+      const weaponLvl = getWeaponLevel(cd?.weapon)
+      const isMaxed = lvl>=90 && Math.min(talents.aa||1,talents.e||1,talents.q||1)>=9 && weaponLvl>=90
+      if(!isMaxed) needed.add(def.weeklyBoss)
+    })
+    return [...needed]
+  })()
+
   const pendingBosses  = WEEKLY_BOSSES
     .filter(b=>!wChecks[b.id])
     .sort((a,b)=>{
-      const ai=BOSS_PRIORITY.indexOf(a.id), bi=BOSS_PRIORITY.indexOf(b.id)
+      const ai=teamBossPriority.indexOf(a.id), bi=teamBossPriority.indexOf(b.id)
       if(ai>=0&&bi>=0) return ai-bi
       if(ai>=0) return -1
       if(bi>=0) return 1
@@ -658,12 +776,6 @@ function ResinCard({ activeTeamId, onChange }) {
   // Next boss resin cost: first 3 claims = 30, after = 60
   const nextBossResin = claimedCount < 3 ? 30 : 60
   const discountLeft  = Math.max(0, 3 - claimedCount)
-
-  // Domain farmable today for active team?
-  const teams        = ls('tv_teams')||[]
-  const trackedChars = ls('tv_chars')||{}
-  const activeTeam   = (activeTeamId&&teams.find(t=>String(t.id)===String(activeTeamId)))||teams[0]
-  const memberIds    = activeTeam ? activeTeam.slots.filter(Boolean) : []
   const activeTalentDomains = today===0?TALENT_DOMAINS:TALENT_DOMAINS.filter(d=>d.days.includes(today))
   const activeWeaponDomains = today===0?WEAPON_DOMAINS:WEAPON_DOMAINS.filter(d=>d.days.includes(today))
 
@@ -713,18 +825,20 @@ function ResinCard({ activeTeamId, onChange }) {
   if(domainFarmable) {
     // Slot 1: talents
     const relevantTalents = new Set()
+    const relevantBookIds = new Set()
     memberIds.forEach(charId => {
       const def = CHARACTERS.find(c=>c.id===charId); if(!def) return
       const cd  = trackedChars[charId]; const talents = cd?.talents||{}
       if(Math.max(talents.aa||1,talents.e||1,talents.q||1)<9)
-        activeTalentDomains.forEach(d=>{ if(d.drops.includes(def.talentBook)) relevantTalents.add(TALENT_BOOKS[def.talentBook]?.name||def.talentBook) })
+        activeTalentDomains.forEach(d=>{ if(d.drops.includes(def.talentBook)) { relevantTalents.add(TALENT_BOOKS[def.talentBook]?.name||def.talentBook); relevantBookIds.add(def.talentBook) } })
     })
+    const firstBookIcon = [...relevantBookIds].map(id=>TALENT_BOOKS[id]?.icon).find(Boolean)
     plan.push({
       label: formatList([...relevantTalents],'Talents') || 'Farm today',
       cost: 20,
       tag: `Talent domain — ${activeTeam?.name||'active team'}`,
       urgent: false,
-      icon: 'https://static.wikia.nocookie.net/gensin-impact/images/3/33/Item_Teachings_of_Resistance.png',
+      icon: firstBookIcon || 'https://static.wikia.nocookie.net/gensin-impact/images/3/33/Item_Teachings_of_Resistance.png',
     })
   } else if(claimedCount < 3) {
     // No talents + <3 bosses done — slot 1 is weekly boss
@@ -978,9 +1092,9 @@ export default function DailyTab({ onChange }) {
   return (
     <div>
       <FarmAlertBanner activeTeamId={activeTeamId}/>
-      <EventsStrip data={calData}/>
       <div className="daily-layout">
         <div>
+          <EventsStrip data={calData}/>
           <div className="daily-checklists">
             <ResinCard activeTeamId={activeTeamId} onChange={onChange}/>
             <DailyCard onChange={onChange}/>
@@ -990,6 +1104,7 @@ export default function DailyTab({ onChange }) {
           <BuildingSection activeTeamId={activeTeamId} onTeamSelect={handleTeamSelect}/>
         </div>
         <div>
+          <TeamQuickPicker activeTeamId={activeTeamId} onTeamSelect={handleTeamSelect}/>
           <BannerSidebar data={calData}/>
         </div>
       </div>
