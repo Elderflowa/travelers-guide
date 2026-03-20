@@ -75,6 +75,7 @@ input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
 .hdr{display:flex;align-items:center;gap:12px;padding:16px 0 12px;border-bottom:1px solid var(--border)}
 .hdr-logo{font-size:1.15rem;font-weight:700;color:var(--gold);letter-spacing:.04em}
 .hdr-logo span{font-weight:300;font-size:.75rem;color:var(--text2);margin-left:6px}
+.hdr-logo a{text-decoration:none;color:inherit}
 .hdr-date{margin-left:auto;font-size:.72rem;color:var(--text3);font-weight:500}
 
 /* ── TABS ── */

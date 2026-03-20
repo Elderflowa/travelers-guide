@@ -48,7 +48,7 @@ function AppInner() {
   return (
     <div className="app">
       <header className="hdr">
-        <div className="hdr-logo">Traveler's Guide <span>self-hosted</span></div>
+        <div className="hdr-logo">Traveler's Guide <a href="https://github.com/elderflowa/travelers-guide" target="_blank" rel="noopener noreferrer"><span>self-hosted</span></a></div>
         <div className="hdr-date">{dateStr()}</div>
         <button onClick={()=>setTheme(isLight?'dark':'light')} title="Toggle theme" style={{
           marginLeft:6, padding:'5px 7px', borderRadius:6,

@@ -7,10 +7,10 @@
       "tv_daily": "{\"key\":\"2026-03-20\",\"checks\":{\"expedition\":true,\"bp\":true,\"commissions\":true}}",
       "tv_weekly": "{\"key\":\"2026-03-16\",\"checks\":{\"w_wolf\":true,\"w_childe\":false,\"w_knave\":true,\"w_natlan\":true,\"w_teapot\":true,\"w_parametric\":true}}",
       "tv_monthly": "{\"key\":\"2026-03\",\"checks\":{\"m_abyss\":true}}",
-      "tv_active_team": "\"1773761959746\"",
+      "tv_active_team": "\"1773761955493\"",
       "tv_ev_dismissed": "[\"Abyssal Moon Spire\",\"The Lament of the Cliff-Shadowed Hollow\"]",
       "tv_plants_ts": "1773862981382"
     },
-    "updatedAt": "2026-03-20T17:24:03.063Z"
+    "updatedAt": "2026-03-20T17:44:50.369Z"
   }
 }
